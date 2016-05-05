@@ -35,7 +35,8 @@ function escapeInvalidHtmlChars(str) {
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/'/g, "&#039;")
+        .replace(/\n/g, "<br/>");
 }
 function getQualifiedFilename(path, filename, separator) {
     if (path && path.substr(-1) !== separator && filename.substr(0) !== separator) {
@@ -302,7 +303,8 @@ function Jasmine2HTMLReporter(options) {
             html += '<ul>';
             _.each(spec.failedExpectations, function(expectation){
                 html += '<li>';
-                html += expectation.message + '<span style="padding:0 1em;color:red;">&#10007;</span>';
+                html += expectation.message + '<span style="padding:0 1em;color:red;" class="tooltip">&#10007;';
+                html += '<span class="tooltiptext">' + escapeInvalidHtmlChars(expectation.stack) + '</span></span>';
                 html += '</li>';
             });
             _.each(spec.passedExpectations, function(expectation){
@@ -355,7 +357,7 @@ function Jasmine2HTMLReporter(options) {
     };
 
     // To remove complexity and be more DRY about the silly preamble and <testsuites> element
-    var prefix = '<!DOCTYPE html><html><head lang=en><meta charset=UTF-8><title></title><style>body{font-family:"open_sans",sans-serif}.suite{width:100%;overflow:auto}.suite .stats{margin:0;width:90%;padding:0}.suite .stats li{display:inline;list-style-type:none;padding-right:20px}.suite h2{margin:0}.suite header{margin:0;padding:5px 0 5px 5px;background:#003d57;color:white}.spec{width:100%;overflow:auto;border-bottom:1px solid #e5e5e5}.spec:hover{background:#e8f3fb}.spec h3{margin:5px 0}.spec .description{margin:1% 2%;width:65%;float:left}.spec .resume{width:29%;margin:1%;float:left;text-align:center}</style></head>';
+    var prefix = '<!DOCTYPE html><html><head lang=en><meta charset=UTF-8><title></title><style>body{font-family:"open_sans",sans-serif}.suite{width:100%;overflow:auto}.suite .stats{margin:0;width:90%;padding:0}.suite .stats li{display:inline;list-style-type:none;padding-right:20px}.suite h2{margin:0}.suite header{margin:0;padding:5px 0 5px 5px;background:#003d57;color:white}.spec{width:100%;overflow:auto;border-bottom:1px solid #e5e5e5}.spec:hover{background:#e8f3fb}.spec h3{margin:5px 0}.spec .description{margin:1% 2%;width:65%;float:left}.spec .resume{width:29%;margin:1%;float:left;text-align:center} .tooltip .tooltiptext { visibility: hidden; background-color: #003d57; color: #fff; border-radius: 6px; padding: 5px 5px; position: absolute; z-index: 1;} .tooltip:hover .tooltiptext { visibility: visible; }</style></head>';
         prefix += '<body><section>';
     var suffix = '\n</section></body></html>';
     function wrapOutputAndWriteFile(filename, text) {
